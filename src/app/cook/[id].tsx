@@ -9,6 +9,7 @@ import { Button, EmptyState, IconButton, Row, Text } from '../../components/ui';
 import { useT } from '../../i18n';
 import { leftoverSuggestions } from '../../lib/match';
 import { cancelTimer, scheduleTimer } from '../../lib/notify';
+import { primeAudio, ring } from '../../lib/beep';
 import { formatClock } from '../../lib/parse/duration';
 import { displayIngredient, scaleIngredient } from '../../lib/scale';
 import { useStore } from '../../store';
@@ -52,6 +53,7 @@ export default function CookMode() {
           next[+k] = { ...tm, done: true, endsAt: undefined, left: 0 };
           changed = true;
           Vibration.vibrate([0, 500, 250, 500]);
+          ring();
         }
       }
       if (changed) setTimers(next);
@@ -74,6 +76,7 @@ export default function CookMode() {
   const last = step === steps.length - 1;
 
   const startTimer = async (i: number, seconds: number) => {
+    primeAudio();
     const existing = timers[i];
     const left = existing?.left && !existing.done ? existing.left : seconds;
     const notificationId = await scheduleTimer(left, t('cook.timerDone'), t('cook.timerDoneBody', { title: recipe.title, i: i + 1 }));

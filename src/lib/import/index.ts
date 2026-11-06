@@ -24,12 +24,12 @@ export function splitInput(input: string): { urls: string[]; text: string } {
 const UA = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Mobile Safari/537.36 Popote/1.0';
 
 async function get(url: string, accept = 'text/html,application/xhtml+xml'): Promise<string> {
-  if (Platform.OS === 'web') throw new ImportError('web-cors', url);
   let res: Response;
   try {
-    res = await fetch(url, { headers: { 'User-Agent': UA, Accept: accept, 'Accept-Language': 'fr,en;q=0.8' } });
+    // browsers refuse custom User-Agent headers and only read sites that allow it (CORS)
+    res = Platform.OS === 'web' ? await fetch(url, { headers: { Accept: accept } }) : await fetch(url, { headers: { 'User-Agent': UA, Accept: accept, 'Accept-Language': 'fr,en;q=0.8' } });
   } catch {
-    throw new ImportError('network', url);
+    throw new ImportError(Platform.OS === 'web' ? 'web-cors' : 'network', url);
   }
   if (res.status === 401 || res.status === 403 || res.status === 429) throw new ImportError('blocked', url);
   if (!res.ok) throw new ImportError('network', url);
@@ -81,6 +81,8 @@ export async function importFromUrl(url: string): Promise<RecipeDraft[]> {
     author: emb?.author,
   });
   if (!draft.ingredients.length && !draft.steps.length) {
+    // on the web only TikTok's oEmbed is readable: a caption without a recipe is "no recipe", not "blocked"
+    if (!html && Platform.OS === 'web' && !(source === 'tiktok' && emb?.title)) throw new ImportError('web-cors', url);
     throw new ImportError(source === 'instagram' || source === 'facebook' ? 'blocked' : 'no-recipe', url);
   }
   if (!draft.title) draft.title = title ?? '';

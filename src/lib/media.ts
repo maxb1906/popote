@@ -51,10 +51,37 @@ export async function pickImages(opts: { camera?: boolean; multiple?: boolean; b
   };
   const res = opts.camera ? await ImagePicker.launchCameraAsync(options) : await ImagePicker.launchImageLibraryAsync(options);
   if (res.canceled) return [];
-  return res.assets.map((a) => {
-    const mediaType = mediaTypeOf(a);
-    const uri = Platform.OS === 'web' && a.base64 ? `data:${mediaType};base64,${a.base64}` : persist(a.uri);
-    return { uri, base64: a.base64 ?? undefined, mediaType };
+  if (Platform.OS === 'web') {
+    // iPhone photos are 3-5 MB: shrink them before they go into the browser's storage
+    return Promise.all(
+      res.assets.map(async (a) => {
+        const src = a.base64 ? `data:${mediaTypeOf(a)};base64,${a.base64}` : a.uri;
+        const uri = await downscaleWeb(src, 1400, 0.8);
+        return { uri, base64: uri.split(',')[1], mediaType: 'image/jpeg' as const };
+      }),
+    );
+  }
+  return res.assets.map((a) => ({ uri: persist(a.uri), base64: a.base64 ?? undefined, mediaType: mediaTypeOf(a) }));
+}
+
+/** Resize an image in the browser so its longest side is at most `max` px; returns a JPEG data URI. */
+export function downscaleWeb(src: string, max: number, quality: number): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(src);
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(src);
+    img.src = src;
   });
 }
 

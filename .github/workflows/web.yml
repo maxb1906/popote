@@ -2,10 +2,10 @@ name: Web app (iPhone, iPad, ordinateur)
 
 # Publishes the installable web version on GitHub Pages:
 # https://<user>.github.io/<repo>/  — on iPhone, open it in Safari, then Share → "Sur l'écran d'accueil".
-# Manual only: GitHub Pages needs a public repository (or a paid plan for private ones).
-# Make the repo public, enable Pages (Settings > Pages > Source: GitHub Actions), then run it
-# from the Actions tab, or add back "push: branches: [main]" to publish on every change.
+# Needs Settings > Pages > Source: "GitHub Actions" (free for public repositories).
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -32,6 +32,7 @@ jobs:
           node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('app.json'));a.expo.experiments={...a.expo.experiments,baseUrl:'/${{ github.event.repository.name }}'};fs.writeFileSync('app.json',JSON.stringify(a,null,2))"
       - run: npx expo export --platform web
       - run: node scripts/pwa.mjs dist /${{ github.event.repository.name }}
+      - run: touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

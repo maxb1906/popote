@@ -49,6 +49,17 @@ export async function shareJson(name: string, data: unknown): Promise<void> {
   const fileName = `${name.replace(/[^\w\-]+/g, '-').slice(0, 60) || 'popote'}.json`;
   if (Platform.OS === 'web') {
     const blob = new Blob([json], { type: 'application/json' });
+    // iPhone / Android browsers: the system share sheet (Files, AirDrop, Messages…)
+    try {
+      const file = new globalThis.File([blob], fileName, { type: 'application/json' });
+      const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+      if (nav.canShare?.({ files: [file] })) {
+        await nav.share({ files: [file], title: fileName });
+        return;
+      }
+    } catch (e) {
+      if ((e as Error)?.name === 'AbortError') return; // the user closed the share sheet
+    }
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = fileName;

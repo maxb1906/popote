@@ -1,9 +1,9 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { uid } from '../lib/text';
 import type { Meal, Notebook, PantryItem, PlanEntry, Recipe, RecipeDraft, Settings, ShoppingItem } from '../lib/types';
 import { defaultLanguage } from '../lib/locale';
+import { appStorage, requestPersistentStorage } from '../lib/storage';
 
 export interface ShoppingState {
   /** ticked keys of generated + manual items */
@@ -165,10 +165,11 @@ export const useStore = create<State>()(
     {
       name: 'popote-v1',
       version: 1,
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => appStorage),
       partialize: ({ recipes, notebooks, plan, pantry, shopping, settings }) => ({ recipes, notebooks, plan, pantry, shopping, settings }),
       onRehydrateStorage: () => () => {
         useStore.setState({ hydrated: true });
+        requestPersistentStorage();
       },
     },
   ),

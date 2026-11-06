@@ -151,6 +151,8 @@ export default function ImportScreen() {
         <Button label={busy === 'link' ? t('import.working') : t('import.go')} icon={Link} size="lg" onPress={run} loading={busy === 'link'} disabled={!input.trim() || !!busy} />
       </View>
 
+      {Platform.OS === 'web' && !errors.length ? <Banner icon={Info}>{t('import.webHint')}</Banner> : null}
+
       {errors.map((e, i) => (
         <Banner key={i} tone="error" icon={TriangleAlert}>
           {e}
