@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "Popote",
+    "slug": "popote",
+    "scheme": "popote",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "org.popote.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Choose a photo for your recipe.",
+        "NSCameraUsageDescription": "Take a photo of your dish or of a recipe."
+      }
+    },
+    "android": {
+      "package": "org.popote.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#AD3D1A",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "backgroundColor": "#FBF6EF",
+          "dark": {
+            "backgroundColor": "#1A1512"
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose a photo for your recipe.",
+          "cameraPermission": "Take a photo of your dish or of a recipe."
+        }
+      ],
+      "expo-notifications"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
