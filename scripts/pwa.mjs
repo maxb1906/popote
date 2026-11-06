@@ -3,11 +3,39 @@
 // (iPhone: Safari → Share → "Add to Home Screen"; Android/desktop: "Install app").
 // Usage: node scripts/pwa.mjs dist /popote
 import { createHash } from 'node:crypto';
-import { copyFileSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const dir = process.argv[2] ?? 'dist';
 const base = (process.argv[3] ?? '').replace(/\/$/, '');
+
+const listFiles = (d, out = []) => {
+  for (const f of readdirSync(d)) {
+    const p = join(d, f);
+    if (statSync(p).isDirectory()) listFiles(p, out);
+    else out.push(p);
+  }
+  return out;
+};
+
+// ---- GitHub Pages refuses to deploy some paths the Expo export produces:
+// a folder named node_modules (assets/node_modules/...) and file names with brackets ([id]-hash.js).
+// Rename them and rewrite the references inside the bundles.
+if (existsSync(join(dir, 'assets/node_modules'))) renameSync(join(dir, 'assets/node_modules'), join(dir, 'assets/vendor'));
+const jsDir = join(dir, '_expo/static/js/web');
+if (existsSync(jsDir)) {
+  for (const f of readdirSync(jsDir)) {
+    const m = f.match(/^\[(\w+)\]-(.*)$/);
+    if (m) renameSync(join(jsDir, f), join(jsDir, `param-${m[1]}-${m[2]}`));
+  }
+}
+for (const f of listFiles(dir).filter((p) => /\.(js|html|json|css)$/.test(p))) {
+  const src = readFileSync(f, 'utf8');
+  const out = src
+    .split('/assets/node_modules/').join('/assets/vendor/')
+    .replace(/(_expo\/static\/js\/web\/)\[(\w+)\]-/g, '$1param-$2-');
+  if (out !== src) writeFileSync(f, out);
+}
 
 copyFileSync('assets/icon.png', join(dir, 'apple-touch-icon.png'));
 copyFileSync('assets/icon.png', join(dir, 'icon-1024.png'));
@@ -59,15 +87,7 @@ writeFileSync(indexPath, html);
 writeFileSync(join(dir, '404.html'), html);
 
 // ---- service worker: precache every file of the build, so the app opens offline ----
-const files = [];
-const walk = (d) => {
-  for (const f of readdirSync(d)) {
-    const p = join(d, f);
-    if (statSync(p).isDirectory()) walk(p);
-    else files.push(p);
-  }
-};
-walk(dir);
+const files = listFiles(dir);
 const urls = files
   .map((f) => relative(dir, f).split('\\').join('/'))
   .filter((f) => !['sw.js', '404.html', 'metadata.json'].includes(f))
