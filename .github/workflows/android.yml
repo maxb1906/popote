@@ -46,9 +46,20 @@ jobs:
       - name: Generate the native Android project
         run: npx expo prebuild --platform android --no-install
 
+      # Gradle dependencies and wrapper, reused from one build to the next
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('package-lock.json', 'app.json') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      # arm64-v8a only: every Android phone sold since ~2017. Smaller APK (~30 MB instead of ~95 MB)
+      # and a much faster build. Remove the -P flag to also support old 32-bit phones and x86 emulators.
       - name: Build the release APK
         working-directory: android
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon --build-cache -PreactNativeArchitectures=arm64-v8a
 
       - name: Name the APK
         run: |
@@ -57,7 +68,7 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk "dist/popote-${VERSION}.apk"
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: popote-apk
           path: dist/*.apk
