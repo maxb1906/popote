@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { ArrowUpDown, BookOpen, FolderOpen, Plus, Refrigerator, Search, SearchX, X } from 'lucide-react-native';
+import { InstallHint } from '../../components/InstallHint';
 import { RecipeCard } from '../../components/RecipeCard';
 import { Button, Chip, EmptyState, IconButton, Row, Text } from '../../components/ui';
 import { MAX_WIDTH } from '../../components/layout';
@@ -81,6 +82,9 @@ export default function Home() {
     return (
       <View style={{ flex: 1, backgroundColor: c.bg }}>
         {header}
+        <View style={{ paddingHorizontal: space[4], paddingTop: space[4], maxWidth: MAX_WIDTH, width: '100%', alignSelf: 'center' }}>
+          <InstallHint />
+        </View>
         <EmptyState icon={BookOpen} title={t('home.empty.title')} body={t('home.empty.body')}>
           <Button label={t('home.empty.import')} icon={Plus} onPress={() => router.push('/import')} />
           <Button
@@ -109,6 +113,7 @@ export default function Home() {
         contentContainerStyle={{ padding: space[4], paddingBottom: 120, maxWidth: MAX_WIDTH, width: '100%', alignSelf: 'center' }}
         ListHeaderComponent={
           <View style={{ gap: space[3], marginBottom: space[4] }}>
+            <InstallHint />
             <View style={[styles.search, { backgroundColor: c.surface, borderColor: c['border-input'] }]}>
               <Search size={18} color={c['text-muted']} />
               <TextInput

@@ -42,7 +42,7 @@ Pas de compte, pas de serveur, pas de pistage, pas de publicité. Tout est stock
 ## Télécharger
 
 - **Android** : téléchargez `popote-x.y.z.apk` depuis la page [Releases](https://github.com/maxb1906/popote/releases/latest), ouvrez-le sur le téléphone et autorisez l'installation. L'APK est reconstruit automatiquement à chaque mise à jour.
-- **iPhone / iPad** : ouvrez [maxb1906.github.io/popote](https://maxb1906.github.io/popote/) dans **Safari**, touchez Partager → **Sur l'écran d'accueil**. Popote s'ouvre alors comme une app, en plein écran, et garde vos données sur l'appareil. Elle marche hors ligne et sonne à la fin des minuteurs. Limite : à part TikTok, les sites ne se laissent pas lire depuis un navigateur ; copiez le texte de la recette (ou la légende) et collez-le dans Importer.
+- **iPhone / iPad** : ouvrez [maxb1906.github.io/popote](https://maxb1906.github.io/popote/) dans **Safari**, touchez Partager → **Sur l'écran d'accueil**. Popote s'ouvre alors comme une app, en plein écran, et garde vos données sur l'appareil. Elle marche hors ligne et sonne à la fin des minuteurs. L'option n'apparaît pas ? Le lien s'est sans doute ouvert dans le navigateur d'une autre app (Instagram, Gmail…) : Popote le détecte et affiche la marche à suivre (Réglages → Installer sur l'écran d'accueil). Limite : à part TikTok, les sites ne se laissent pas lire depuis un navigateur ; copiez le texte de la recette (ou la légende) et collez-le dans Importer.
 - **iPhone, app native** : avec Expo Go (voir ci-dessous) pour l'essayer, ou via TestFlight / App Store, qui demande un compte Apple Developer.
 
 ## Installer et lancer

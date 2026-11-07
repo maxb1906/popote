@@ -37,9 +37,11 @@ export default function CookMode() {
   const [showIngredients, setShowIngredients] = useState(false);
   const [finished, setFinished] = useState(false);
   const [timers, setTimers] = useState<Record<number, RunningTimer>>({});
-  const [, tick] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
   const timersRef = useRef(timers);
-  timersRef.current = timers;
+  useEffect(() => {
+    timersRef.current = timers;
+  }, [timers]);
 
   // one clock for every timer
   useEffect(() => {
@@ -57,7 +59,7 @@ export default function CookMode() {
         }
       }
       if (changed) setTimers(next);
-      tick((n) => n + 1);
+      setNow(now);
     }, 500);
     return () => clearInterval(h);
   }, []);
@@ -81,6 +83,7 @@ export default function CookMode() {
     const left = existing?.left && !existing.done ? existing.left : seconds;
     const notificationId = await scheduleTimer(left, t('cook.timerDone'), t('cook.timerDoneBody', { title: recipe.title, i: i + 1 }));
     setTimers((all) => ({ ...all, [i]: { step: i, total: seconds, endsAt: Date.now() + left * 1000, notificationId } }));
+    setNow(Date.now());
   };
   const pauseTimer = (i: number) => {
     const tm = timers[i];
@@ -92,7 +95,7 @@ export default function CookMode() {
     cancelTimer(timers[i]?.notificationId);
     setTimers(({ [i]: _gone, ...rest }) => rest);
   };
-  const secondsLeft = (tm: RunningTimer) => (tm.endsAt ? (tm.endsAt - Date.now()) / 1000 : (tm.left ?? tm.total));
+  const secondsLeft = (tm: RunningTimer) => (tm.endsAt ? Math.max(0, (tm.endsAt - now) / 1000) : (tm.left ?? tm.total));
 
   const finish = () => {
     markCooked(recipe.id);

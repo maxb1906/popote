@@ -41,6 +41,7 @@ export default function RootLayout() {
           <Stack.Screen name="notebooks" options={{ title: t('notebooks.title') }} />
           <Stack.Screen name="fridge" options={{ title: t('home.fridge') }} />
           <Stack.Screen name="ai" options={{ title: t('ai.title') }} />
+          <Stack.Screen name="install" options={{ title: t('install.title') }} />
         </Stack>
       )}
       <ToastHost />

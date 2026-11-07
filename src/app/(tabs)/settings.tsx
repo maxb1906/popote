@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
 import Constants from 'expo-constants';
-import { Download, FolderOpen, Code, House, KeyRound, Trash2, Upload } from 'lucide-react-native';
+import { Download, FolderOpen, Code, House, KeyRound, Smartphone, Trash2, Upload } from 'lucide-react-native';
 import { Page } from '../../components/layout';
 import { Card, Chip, Divider, ListRow, Row, Section, Text } from '../../components/ui';
 import { confirm, toast } from '../../components/feedback';
@@ -11,6 +11,7 @@ import { isBackup, makeBackup, mergeRecipes, pickFile, restoreImages, shareJson 
 import { useStore } from '../../store';
 import { space } from '../../theme';
 import { REPO_URL } from '../../config';
+import { installMode } from '../../lib/install';
 
 
 export default function SettingsScreen() {
@@ -116,6 +117,12 @@ export default function SettingsScreen() {
         </Text>
         <Card style={{ paddingHorizontal: space[4] }}>
           <ListRow icon={Code} title={t('settings.source')} subtitle={REPO_URL} onPress={() => Linking.openURL(REPO_URL)} />
+          {installMode() !== 'native' && installMode() !== 'installed' ? (
+            <>
+              <Divider />
+              <ListRow icon={Smartphone} title={t('settings.install')} onPress={() => router.push('/install')} />
+            </>
+          ) : null}
         </Card>
         <Text variant="xs" tone="muted">
           {t('settings.version', { v: Constants.expoConfig?.version ?? '1.0.0' })}
