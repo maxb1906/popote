@@ -1,0 +1,26 @@
+{
+  "name": "Popote",
+  "short_name": "Popote",
+  "description": "Carnet de recettes libre : importer, cuisiner, planifier, faire les courses.",
+  "lang": "fr",
+  "start_url": "/popote/",
+  "scope": "/popote/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF6EF",
+  "theme_color": "#FBF6EF",
+  "icons": [
+    {
+      "src": "/popote/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/popote/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
